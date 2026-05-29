@@ -5,6 +5,9 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/layout/navbar";
 import ParticleBackground from "@/components/landing/particlebackground";
+import FeaturesSection from "@/components/landing/FeaturesSection";
+import PricingSection from "@/components/landing/PricingSection";
+import AboutSection from "@/components/landing/AboutSection";
 import MagneticButton from "@/components/ui/MagneticButton";
 import { useCursor } from "@/context/CursorContext";
 
@@ -57,12 +60,12 @@ interface NebulaParticle {
 
 const PLANET_ROUTES: Record<string, string> = {
   "Resume AI":  "/resume",
-  "Job Match":  "/dashboard",
+  "Job Match":  "/jobs",
   "Interviews": "/interview",
   "Analytics":  "/dashboard",
-  "Roadmap":    "/dashboard",
+  "Roadmap":    "/roadmap",
   "Coding":     "/coding",
-  "HR Prep":    "/hr",
+  "HR Prep":    "/hr",       
   "Practice":   "/practice",
 };
 
@@ -718,6 +721,16 @@ export default function Home() {
         </motion.div>
 
       </section>
+
+      {/* ── FEATURES SECTION ────────────────────────────────────────────────── */}
+      <FeaturesSection />
+
+      {/* ── PRICING SECTION ─────────────────────────────────────────────────── */}
+      <PricingSection />
+
+      {/* ── ABOUT SECTION ───────────────────────────────────────────────────── */}
+      <AboutSection />
+
     </main>
   );
 }

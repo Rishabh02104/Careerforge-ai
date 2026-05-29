@@ -8,10 +8,10 @@ import { useCursor } from "@/context/CursorContext";
 import { useTransition } from "@/context/TransitionContext";
 
 const navLinks = [
-  { label: "Features", href: "#features", transition: "fade" as const },
-  { label: "Dashboard", href: "/dashboard", transition: "fade" as const },
-  { label: "Pricing", href: "#pricing", transition: "fade" as const },
-  { label: "About", href: "#about", transition: "fade" as const },
+  { label: "Features",  href: "/#features",  transition: "fade" as const, scroll: true  },
+  { label: "Dashboard", href: "/dashboard",   transition: "fade" as const, scroll: false },
+  { label: "Pricing",   href: "/#pricing",   transition: "fade" as const, scroll: true  },
+  { label: "About",     href: "/#about",     transition: "fade" as const, scroll: true  },
 ];
 
 export default function Navbar() {
@@ -37,11 +37,24 @@ export default function Navbar() {
     return () => window.removeEventListener("mousemove", handleMouse);
   }, []);
 
-  const handleNavClick = (href: string, transition: "fade" | "ripple" | "wipe" | "shatter") => {
-    if (href.startsWith("#")) {
-      triggerTransition(transition, () => {
-        document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
-      });
+    const handleNavClick = (
+    href: string,
+    transition: "fade" | "ripple" | "wipe" | "shatter",
+    scroll: boolean
+  ) => {
+    if (scroll) {
+      // Extract the hash — e.g. "/#features" → "#features"
+      const hash = href.split("/").pop() || href;
+      const el = document.querySelector(hash);
+      if (el) {
+        // Already on homepage — just scroll
+        el.scrollIntoView({ behavior: "smooth" });
+      } else {
+        // On another page — navigate home then scroll
+        triggerTransition(transition, () => {
+          router.push(href);
+        });
+      }
     } else {
       triggerTransition(transition, () => router.push(href));
     }
@@ -82,7 +95,7 @@ export default function Navbar() {
             whileHover={{ y: -4, color: "#22d3ee" }}
             onMouseEnter={() => setCursor({ mode: "magnetic" })}
             onMouseLeave={resetCursor}
-            onClick={() => handleNavClick(link.href, link.transition)}
+            onClick={() => handleNavClick(link.href, link.transition, link.scroll)}
           >
             {link.label}
           </motion.button>

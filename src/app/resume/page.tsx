@@ -46,8 +46,23 @@ function ScoreRing({ score, color, size = 80 }: { score: number; color: string; 
 }
 
 function AnalysisResult({ analysis }: { analysis: ResumeAnalysis }) {
-  const scoreColor = analysis.overallScore >= 80 ? "#22d3ee" : analysis.overallScore >= 60 ? "#a78bfa" : "#f87171";
-  const scoreLabel = analysis.overallScore >= 80 ? "Excellent" : analysis.overallScore >= 60 ? "Good" : "Needs Work";
+const scoreColor =
+  analysis.overallScore === 0
+    ? "#f87171"
+    : analysis.overallScore >= 80
+    ? "#22d3ee"
+    : analysis.overallScore >= 60
+    ? "#a78bfa"
+    : "#f87171";
+
+const scoreLabel =
+  analysis.overallScore === 0
+    ? "Failed"
+    : analysis.overallScore >= 80
+    ? "Excellent"
+    : analysis.overallScore >= 60
+    ? "Good"
+    : "Needs Work";
 
   const subScores = [
     { label: "ATS Score",    value: analysis.atsScore,        color: "#22d3ee" },
@@ -269,10 +284,32 @@ export default function ResumePage() {
 
     try {
       const text = await extractTextFromFile(file);
+
+      // Show user what was extracted (debug helper)
+      console.log("Extracted text preview:", text.slice(0, 200));
+
+      // Warn if extraction likely failed
+      if (text.startsWith("Resume file:") || text.startsWith("Resume:")) {
+        setErrorMsg(text);
+        setUploadState("error");
+        return;
+      }
+
       const result = await analyzeResume(text);
+
+      // If all scores are 0 something went wrong
+      if (result.overallScore === 0) {
+        setErrorMsg(
+          "Could not extract text from this file. Please try uploading as a .txt or .docx file instead."
+        );
+        setUploadState("error");
+        return;
+      }
+
       setAnalysis(result);
       setUploadState("done");
     } catch (err) {
+      console.error(err);
       setErrorMsg("Analysis failed. Please try again.");
       setUploadState("error");
     }

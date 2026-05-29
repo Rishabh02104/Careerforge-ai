@@ -673,6 +673,7 @@ export default function InterviewPage() {
     <main className="min-h-screen bg-[#050816] text-white px-6 py-10">
       <div className="max-w-4xl mx-auto">
         {/* Top nav */}
+        {/* Top nav */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -682,8 +683,9 @@ export default function InterviewPage() {
             href="/practice"
             className="text-cyan-400 text-sm hover:underline"
           >
-            ← Back to Practice
+            ← Practice Center
           </Link>
+
           {stage === "interview" && session && (
             <div className="flex items-center gap-2 text-xs text-slate-400">
               <motion.span
@@ -695,7 +697,6 @@ export default function InterviewPage() {
             </div>
           )}
         </motion.div>
-
         <AnimatePresence mode="wait">
           {stage === "setup" && (
             <SetupScreen key="setup" onStart={startInterview} />
