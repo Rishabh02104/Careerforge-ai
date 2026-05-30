@@ -65,7 +65,7 @@ const PLANET_ROUTES: Record<string, string> = {
   "Analytics":  "/dashboard",
   "Roadmap":    "/roadmap",
   "Coding":     "/coding",
-  "HR Prep":    "/hr",       
+  "HR Prep":    "/hr",
   "Practice":   "/practice",
 };
 
