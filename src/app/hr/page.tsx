@@ -116,34 +116,31 @@ const CATEGORIES = [
   ...Array.from(new Set(HR_QUESTIONS.map((q) => q.category))),
 ];
 
+import { generateAIResponse } from "@/services/ai";
+
 async function getAIFeedback(
   question: string,
   userAnswer: string
 ): Promise<string> {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 400,
-      messages: [
-        {
-          role: "user",
-          content: `You are an expert HR interview coach.
+  try {
+    const prompt = `
+You are an expert HR interview coach.
 
 Question: "${question}"
+
 Candidate's answer: "${userAnswer}"
 
-Give specific, actionable feedback in 3-4 sentences. Rate it as Strong / Good / Needs Work and explain why. Be encouraging but honest.`,
-        },
-      ],
-    }),
-  });
-  const data = await response.json();
-  return (
-    data.content?.[0]?.text ||
-    "Good attempt! Focus on using specific examples with measurable outcomes."
-  );
+Give specific, actionable feedback in 3-4 sentences.
+Rate it as Strong / Good / Needs Work and explain why.
+Be encouraging but honest.
+`;
+
+    return await generateAIResponse(prompt);
+  } catch (error) {
+    console.error("AI Feedback Error:", error);
+
+    return "Good attempt! Focus on using specific examples with measurable outcomes.";
+  }
 }
 
 export default function HRPage() {

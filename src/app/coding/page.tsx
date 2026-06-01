@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { generateAIResponse } from "@/services/ai";
 
 interface Problem {
   id: number;
@@ -156,56 +157,61 @@ const PROBLEMS: Problem[] = [
 
 type EditorState = "idle" | "running" | "success" | "error";
 
-async function getAIHint(problem: Problem, code: string): Promise<string> {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 400,
-      messages: [
-        {
-          role: "user",
-          content: `You are a coding mentor. The student is solving "${problem.title}".
+async function getAIHint(
+  problem: Problem,
+  code: string
+): Promise<string> {
+  try {
+    const prompt = `
+You are a coding mentor.
 
-Their current code:
+The student is solving "${problem.title}".
+
+Current code:
+
 \`\`\`javascript
 ${code}
 \`\`\`
 
-Give a helpful hint (NOT the full solution) in 2-3 sentences. Be encouraging and point them in the right direction.`,
-        },
-      ],
-    }),
-  });
-  const data = await response.json();
-  return (
-    data.content?.[0]?.text ||
-    "Think about the time complexity. Can you solve this in O(n)?"
-  );
+Give a helpful hint (NOT the full solution) in 2-3 sentences.
+Be encouraging and point them in the right direction.
+Focus on the algorithm, edge cases, or time complexity if relevant.
+`;
+
+    return await generateAIResponse(prompt);
+  } catch (error) {
+    console.error("AI Hint Error:", error);
+
+    return "Think about the time complexity. Can you solve this in O(n)?";
+  }
 }
 
-async function getAISolution(problem: Problem): Promise<string> {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 600,
-      messages: [
-        {
-          role: "user",
-          content: `Provide a clean, well-commented JavaScript solution for: "${problem.title}".
 
+async function getAISolution(
+  problem: Problem
+): Promise<string> {
+  try {
+    const prompt = `
+Provide a clean, well-commented JavaScript solution for:
+
+Title: ${problem.title}
+
+Problem:
 ${problem.description}
 
-Format: just the code with comments explaining the approach. Include time/space complexity at the top as a comment.`,
-        },
-      ],
-    }),
-  });
-  const data = await response.json();
-  return data.content?.[0]?.text || "// Solution unavailable";
+Requirements:
+- Return only JavaScript code
+- Add comments explaining the approach
+- Include time complexity and space complexity at the top
+- Follow best coding practices
+`;
+
+    return await generateAIResponse(prompt);
+  } catch (error) {
+    console.error("AI Solution Error:", error);
+
+    return `// Solution unavailable`;
+  }
 }
 
 const difficultyConfig = {

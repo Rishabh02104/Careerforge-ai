@@ -1,4 +1,5 @@
 import * as mammoth from "mammoth";
+import { generateAIResponse } from "@/services/ai";
 
 export interface ResumeAnalysis {
   overallScore: number;
@@ -120,16 +121,7 @@ export async function analyzeResume(
   }
 
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        messages: [
-          {
-            role: "user",
-            content: `You are an expert ATS (Applicant Tracking System) resume analyzer.
+    const prompt = `You are an expert ATS (Applicant Tracking System) resume analyzer.
 
 Analyze this resume and respond ONLY with a valid JSON object. No explanation, no markdown, no backticks. Just raw JSON.
 
@@ -151,20 +143,9 @@ Respond with exactly this JSON structure:
   "suggestedKeywords": [<5-6 keywords to add>],
   "summary": "<2 sentence summary of the resume>",
   "jobTitleMatch": "<most likely job title this resume targets>"
-}`,
-          },
-        ],
-      }),
-    });
+}`;
 
-    if (!response.ok) {
-      console.error("API error:", response.status);
-      return getFallbackAnalysis();
-    }
-
-    const data = await response.json();
-    const text = data.content?.[0]?.text || "";
-
+const text = await generateAIResponse(prompt);
     // Strip any accidental markdown
     const cleaned = text
       .replace(/```json/g, "")
