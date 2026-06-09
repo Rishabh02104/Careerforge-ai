@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -9,10 +9,16 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function SignupPage() {
   const router = useRouter();
-  const { refreshSession } = useAuth();
+  const { user, loading, refreshSession } = useAuth();
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.push(user.role === "admin" ? "/admin" : "/dashboard");
+    }
+  }, [user, loading, router]);
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
   function validate() {
@@ -27,12 +33,12 @@ export default function SignupPage() {
     const e = validate();
     if (Object.keys(e).length) { setErrors(e); return; }
 
-    setLoading(true);
+    setIsSubmitting(true);
     await new Promise(r => setTimeout(r, 800)); // simulate API
 
     if (findUserByEmail(form.email)) {
       setErrors({ email: "Account already exists" });
-      setLoading(false);
+      setIsSubmitting(false);
       return;
     }
 
@@ -146,12 +152,12 @@ export default function SignupPage() {
 
                 <motion.button
                   onClick={handleSubmit}
-                  disabled={loading}
+                  disabled={isSubmitting}
                   className="mt-2 w-full rounded-xl bg-cyan-500 py-3 font-semibold text-black text-sm relative overflow-hidden"
                   whileHover={{ scale: 1.02, boxShadow: "0 8px 30px rgba(34,211,238,0.35)" }}
                   whileTap={{ scale: 0.97 }}
                 >
-                  {loading ? (
+                  {isSubmitting ? (
                     <motion.span
                       className="inline-block w-4 h-4 border-2 border-black/30 border-t-black rounded-full"
                       animate={{ rotate: 360 }}

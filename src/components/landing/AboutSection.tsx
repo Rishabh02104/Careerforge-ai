@@ -4,10 +4,10 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 
 const stats = [
-  { value: "50K+", label: "Active users",       color: "#22d3ee" },
-  { value: "94%",  label: "Interview success",  color: "#8b5cf6" },
-  { value: "200+", label: "Coding problems",    color: "#06b6d4" },
-  { value: "4.9★", label: "User rating",        color: "#a78bfa" },
+  { value: "Beta", label: "Current Stage",      color: "#22d3ee" },
+  { value: "5",    label: "Career Paths",       color: "#8b5cf6" },
+  { value: "10",   label: "Coding Problems",    color: "#06b6d4" },
+  { value: "12",   label: "HR Prep Questions",  color: "#a78bfa" },
 ];
 
 const values = [
@@ -122,7 +122,7 @@ export default function AboutSection() {
             Ready to forge your career?
           </h3>
           <p className="text-slate-400 mb-8 max-w-xl mx-auto">
-            Join 50,000+ professionals who used CareerForge to land their dream jobs.
+            Use CareerForge to advance your preparation and land your dream job.
             Start free — no credit card required.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
@@ -140,7 +140,7 @@ export default function AboutSection() {
               whileHover={{ scale: 1.04, backgroundColor: "rgba(255,255,255,0.08)" }}
               whileTap={{ scale: 0.97 }}
             >
-              Watch Demo
+              Interactive Sandbox
             </motion.button>
           </div>
         </motion.div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -9,10 +9,16 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { refreshSession } = useAuth();
+  const { user, loading, refreshSession } = useAuth();
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.push(user.role === "admin" ? "/admin" : "/dashboard");
+    }
+  }, [user, loading, router]);
   const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isDev = process.env.NODE_ENV === "development";
 
@@ -27,20 +33,20 @@ export default function LoginPage() {
     const e = validate();
     if (Object.keys(e).length) { setErrors(e); return; }
 
-    setLoading(true);
+    setIsSubmitting(true);
     await new Promise((r) => setTimeout(r, 700));
 
     const user = findUserByEmail(form.email);
 
     if (!user) {
       setErrors({ email: "No account found with this email" });
-      setLoading(false);
+      setIsSubmitting(false);
       return;
     }
 
     if (user.password !== form.password) {
       setErrors({ password: "Incorrect password" });
-      setLoading(false);
+      setIsSubmitting(false);
       return;
     }
 
@@ -187,7 +193,7 @@ export default function LoginPage() {
 
             <motion.button
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={isSubmitting}
               className="mt-2 w-full rounded-xl bg-cyan-500 py-3 font-semibold text-black text-sm"
               whileHover={{
                 scale: 1.02,
@@ -195,7 +201,7 @@ export default function LoginPage() {
               }}
               whileTap={{ scale: 0.97 }}
             >
-              {loading ? (
+              {isSubmitting ? (
                 <motion.span
                   className="inline-block w-4 h-4 border-2 border-black/30 border-t-black rounded-full"
                   animate={{ rotate: 360 }}

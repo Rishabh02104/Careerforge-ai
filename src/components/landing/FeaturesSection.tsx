@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useRef } from "react";
+import Link from "next/link";
 import { useCursor } from "@/context/CursorContext";
 
 const features = [
@@ -10,35 +11,40 @@ const features = [
     title: "AI Resume Analyzer",
     desc: "Upload your resume and get instant ATS score, keyword gap analysis, and actionable improvement suggestions powered by Claude AI.",
     color: "#22d3ee",
-    stats: "78% avg score improvement",
+    stats: "Instant ATS feedback",
+    href: "/resume",
   },
   {
     icon: "💬",
     title: "AI Mock Interviews",
     desc: "Practice with an AI interviewer that asks real questions, scores your answers live, and gives detailed feedback on every response.",
     color: "#8b5cf6",
-    stats: "94% interview success rate",
+    stats: "Live AI evaluation",
+    href: "/interview",
   },
   {
     icon: "💻",
     title: "Coding Practice",
     desc: "Solve DSA problems with a live code editor. Get AI hints when stuck and full solution walkthroughs with time complexity analysis.",
     color: "#06b6d4",
-    stats: "200+ curated problems",
+    stats: "10 curated problems",
+    href: "/coding",
   },
   {
     icon: "🗺️",
     title: "Career Roadmap",
     desc: "Get a personalized skill-based learning path to your dream role. Know exactly what to learn next and track your progress.",
     color: "#a78bfa",
-    stats: "50+ career paths",
+    stats: "5 comprehensive paths",
+    href: "/roadmap",
   },
   {
     icon: "🎯",
     title: "Job Match",
     desc: "AI matches your profile to real job listings. See your match percentage, skills gap, and what to improve to land the role.",
     color: "#34d399",
-    stats: "10K+ job listings",
+    stats: "Curated tech roles",
+    href: "/jobs",
   },
   {
     icon: "📊",
@@ -46,6 +52,7 @@ const features = [
     desc: "Track your resume score, interview performance, coding progress, and overall career readiness in one unified dashboard.",
     color: "#f59e0b",
     stats: "Real-time insights",
+    href: "/dashboard",
   },
 ];
 
@@ -60,61 +67,63 @@ function FeatureCard({
   const ref = useRef<HTMLDivElement>(null);
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{
-        duration: 0.6,
-        delay: index * 0.1,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      whileHover={{ y: -6 }}
-      className="relative rounded-2xl border border-white/8 bg-white/3 backdrop-blur-xl p-6 flex flex-col gap-4 overflow-hidden group cursor-pointer"
-      onMouseEnter={() => setCursor({ mode: "magnetic" })}
-      onMouseLeave={resetCursor}
-    >
-      {/* Hover glow */}
+    <Link href={feature.href} className="block h-full">
       <motion.div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none"
-        style={{
-          background: `radial-gradient(circle at 50% 0%, ${feature.color}15 0%, transparent 70%)`,
+        ref={ref}
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{
+          duration: 0.6,
+          delay: index * 0.1,
+          ease: [0.22, 1, 0.36, 1],
         }}
-      />
-
-      {/* Top border glow on hover */}
-      <motion.div
-        className="absolute top-0 left-0 right-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        style={{ background: `linear-gradient(90deg, transparent, ${feature.color}80, transparent)` }}
-      />
-
-      {/* Icon */}
-      <div
-        className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-        style={{ background: feature.color + "15", border: `1px solid ${feature.color}25` }}
+        whileHover={{ y: -6 }}
+        className="relative rounded-2xl border border-white/8 bg-white/3 backdrop-blur-xl p-6 flex flex-col gap-4 overflow-hidden group cursor-pointer h-full"
+        onMouseEnter={() => setCursor({ mode: "magnetic" })}
+        onMouseLeave={resetCursor}
       >
-        {feature.icon}
-      </div>
+        {/* Hover glow */}
+        <motion.div
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none"
+          style={{
+            background: `radial-gradient(circle at 50% 0%, ${feature.color}15 0%, transparent 70%)`,
+          }}
+        />
 
-      {/* Content */}
-      <div className="flex flex-col gap-2 flex-1">
-        <h3 className="font-semibold text-white text-base">{feature.title}</h3>
-        <p className="text-slate-400 text-sm leading-relaxed">{feature.desc}</p>
-      </div>
+        {/* Top border glow on hover */}
+        <motion.div
+          className="absolute top-0 left-0 right-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          style={{ background: `linear-gradient(90deg, transparent, ${feature.color}80, transparent)` }}
+        />
 
-      {/* Stats */}
-      <div
-        className="text-[11px] font-medium px-3 py-1.5 rounded-full w-fit"
-        style={{
-          color: feature.color,
-          background: feature.color + "12",
-          border: `1px solid ${feature.color}25`,
-        }}
-      >
-        ✦ {feature.stats}
-      </div>
-    </motion.div>
+        {/* Icon */}
+        <div
+          className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
+          style={{ background: feature.color + "15", border: `1px solid ${feature.color}25` }}
+        >
+          {feature.icon}
+        </div>
+
+        {/* Content */}
+        <div className="flex flex-col gap-2 flex-1">
+          <h3 className="font-semibold text-white text-base">{feature.title}</h3>
+          <p className="text-slate-400 text-sm leading-relaxed">{feature.desc}</p>
+        </div>
+
+        {/* Stats */}
+        <div
+          className="text-[11px] font-medium px-3 py-1.5 rounded-full w-fit"
+          style={{
+            color: feature.color,
+            background: feature.color + "12",
+            border: `1px solid ${feature.color}25`,
+          }}
+        >
+          ✦ {feature.stats}
+        </div>
+      </motion.div>
+    </Link>
   );
 }
 
@@ -174,9 +183,7 @@ export default function FeaturesSection() {
           className="text-center mt-12"
         >
           <p className="text-slate-500 text-sm">
-            Join{" "}
-            <span className="text-white font-medium">50,000+</span>{" "}
-            professionals already using CareerForge
+            Start preparing with CareerForge during our active beta phase
           </p>
         </motion.div>
       </div>

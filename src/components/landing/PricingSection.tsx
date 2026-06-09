@@ -37,7 +37,7 @@ const plans = [
     features: [
       "Unlimited resume analyses",
       "Unlimited mock interviews",
-      "All 200+ coding problems",
+      "All 10 coding problems",
       "Full career roadmap",
       "AI job matching",
       "Detailed analytics",

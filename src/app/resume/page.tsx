@@ -246,6 +246,8 @@ export default function ResumePage() {
   const [dragOver, setDragOver] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [loadingStep, setLoadingStep] = useState(0);
+  const [showPasteFallback, setShowPasteFallback] = useState(false);
+  const [pastedText, setPastedText] = useState("");
 
   const loadingSteps = [
     "Reading your resume...",
@@ -258,19 +260,11 @@ export default function ResumePage() {
   const processFile = useCallback(async (file: File) => {
     if (!file) return;
 
-    const validTypes = ["application/pdf", "text/plain", "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
-
-    if (!validTypes.includes(file.type) && !file.name.match(/\.(pdf|txt|doc|docx)$/i)) {
-      setErrorMsg("Please upload a PDF, DOC, DOCX, or TXT file");
-      setUploadState("error");
-      return;
-    }
-
     setFileName(file.name);
     setUploadState("uploading");
     setAnalysis(null);
     setErrorMsg("");
+    setShowPasteFallback(false);
 
     // Simulate upload progress
     await new Promise(r => setTimeout(r, 600));
@@ -288,9 +282,9 @@ export default function ResumePage() {
       // Show user what was extracted (debug helper)
       console.log("Extracted text preview:", text.slice(0, 200));
 
-      // Warn if extraction likely failed
-      if (text.startsWith("Resume file:") || text.startsWith("Resume:")) {
-        setErrorMsg(text);
+      if (text === "SCANNED_PDF_OR_EMPTY") {
+        setErrorMsg("This looks like a scanned PDF or empty document. Please paste your resume text below to continue:");
+        setShowPasteFallback(true);
         setUploadState("error");
         return;
       }
@@ -300,20 +294,64 @@ export default function ResumePage() {
       // If all scores are 0 something went wrong
       if (result.overallScore === 0) {
         setErrorMsg(
-          "Could not extract text from this file. Please try uploading as a .txt or .docx file instead."
+          "Could not analyze text from this file. Please paste your resume text below to complete the check:"
         );
+        setShowPasteFallback(true);
         setUploadState("error");
         return;
+      }
+
+      // Save to localStorage
+      if (typeof window !== "undefined") {
+        localStorage.setItem("cf_last_resume_analysis", JSON.stringify(result));
       }
 
       setAnalysis(result);
       setUploadState("done");
     } catch (err) {
       console.error(err);
-      setErrorMsg("Analysis failed. Please try again.");
+      setErrorMsg("Analysis failed. Please paste your resume text below to try again:");
+      setShowPasteFallback(true);
       setUploadState("error");
     }
   }, []);
+
+  const handleAnalyzePastedText = async () => {
+    if (pastedText.trim().length < 50) {
+      setErrorMsg("Please paste at least 50 characters of resume content.");
+      return;
+    }
+    setErrorMsg("");
+    setFileName("Pasted Resume Text");
+    setUploadState("analyzing");
+
+    for (let i = 2; i < loadingSteps.length; i++) {
+      setLoadingStep(i);
+      await new Promise(r => setTimeout(r, 450));
+    }
+
+    try {
+      const result = await analyzeResume(pastedText);
+      if (result.overallScore === 0) {
+        setErrorMsg("Failed to analyze the pasted text. Please make sure it resembles a resume.");
+        setUploadState("error");
+        return;
+      }
+
+      // Save to localStorage
+      if (typeof window !== "undefined") {
+        localStorage.setItem("cf_last_resume_analysis", JSON.stringify(result));
+      }
+
+      setAnalysis(result);
+      setUploadState("done");
+      setShowPasteFallback(false);
+    } catch (err) {
+      console.error(err);
+      setErrorMsg("Analysis failed. Please try again.");
+      setUploadState("error");
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -409,13 +447,39 @@ export default function ResumePage() {
                 </span>
 
                 {uploadState === "error" && (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="mt-4 text-red-400 text-sm"
-                  >
-                    ⚠️ {errorMsg}
-                  </motion.p>
+                  <div className="mt-4 flex flex-col gap-3">
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-red-400 text-sm"
+                    >
+                      ⚠️ {errorMsg}
+                    </motion.p>
+                    {showPasteFallback && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="w-full max-w-xl mx-auto flex flex-col gap-3 p-4 bg-white/5 border border-white/10 rounded-2xl"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <textarea
+                          value={pastedText}
+                          onChange={(e) => setPastedText(e.target.value)}
+                          placeholder="Paste your resume content here (experience, skills, projects)..."
+                          rows={6}
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500/40 resize-none leading-relaxed transition"
+                        />
+                        <motion.button
+                          onClick={handleAnalyzePastedText}
+                          className="rounded-xl bg-cyan-500 py-2.5 font-semibold text-black text-xs shadow-lg shadow-cyan-500/10"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.97 }}
+                        >
+                          Analyze Pasted Resume →
+                        </motion.button>
+                      </motion.div>
+                    )}
+                  </div>
                 )}
               </motion.div>
             </motion.div>

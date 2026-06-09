@@ -202,7 +202,7 @@ export default function SidePanel() {
           {[
             { icon: "💬", label: "Mock Interview", tag: "AI", color: "#22d3ee" },
             { icon: "💻", label: "Coding Rounds",  tag: "Live", color: "#8b5cf6" },
-            { icon: "🧠", label: "HR Questions",   tag: "50+", color: "#a78bfa" },
+            { icon: "🧠", label: "HR Questions",   tag: "12", color: "#a78bfa" },
           ].map((item, i) => (
             <motion.button
               key={item.label}

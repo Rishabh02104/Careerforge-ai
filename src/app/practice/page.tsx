@@ -21,7 +21,7 @@ const practices = [
       "Detailed feedback per question",
       "Full report with grade at end",
     ],
-    stats: "94% interview success rate",
+    stats: "Interactive session scoring",
     cta: "Start Interview",
   },
   {
@@ -32,28 +32,28 @@ const practices = [
     color: "#8b5cf6",
     href: "/coding",
     items: [
-      "200+ curated problems",
+      "10 curated problems",
       "Easy, Medium, Hard difficulty",
       "AI hints on demand",
       "Full solution walkthroughs",
     ],
-    stats: "200+ problems across 10 topics",
+    stats: "10 problems across 6 topics",
     cta: "Start Coding",
   },
   {
     icon: "🧠",
     title: "HR Questions",
-    desc: "Master the 50+ most common HR questions. Practice your answers and get AI feedback instantly.",
-    tag: "50+ Questions",
+    desc: "Master the 12 most common HR questions. Practice your answers and get AI feedback instantly.",
+    tag: "12 Questions",
     color: "#06b6d4",
     href: "/hr",
     items: [
-      "50+ real HR questions",
+      "12 real HR questions",
       "Model answers for each",
       "AI feedback on your answers",
       "Progress tracking",
     ],
-    stats: "50+ questions across 6 categories",
+    stats: "12 questions across 6 categories",
     cta: "Start HR Prep",
   },
 ];
@@ -126,9 +126,9 @@ export default function PracticePage() {
             {/* Quick stats */}
             <div className="flex gap-4 flex-wrap">
               {[
-                { value: "94%",  label: "Success rate",  color: "#22d3ee" },
-                { value: "200+", label: "Problems",      color: "#8b5cf6" },
-                { value: "50+",  label: "HR questions",  color: "#06b6d4" },
+                { value: "AI", label: "Mock Interviews", color: "#22d3ee" },
+                { value: "10", label: "DSA Problems",    color: "#8b5cf6" },
+                { value: "12", label: "HR Questions",    color: "#06b6d4" },
               ].map((s) => (
                 <motion.div
                   key={s.label}

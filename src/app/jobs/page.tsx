@@ -472,6 +472,19 @@ function JobDetail({ job }: { job: Job }) {
           href={job.applyUrl}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => {
+            if (typeof window !== "undefined") {
+              try {
+                const applied = JSON.parse(localStorage.getItem("cf_jobs_applied") || "[]");
+                if (!applied.includes(job.id)) {
+                  applied.push(job.id);
+                  localStorage.setItem("cf_jobs_applied", JSON.stringify(applied));
+                }
+              } catch (e) {
+                console.error(e);
+              }
+            }
+          }}
           className="flex-1 rounded-xl py-3 text-sm font-semibold text-black text-center"
           style={{ background: matchColor }}
           whileHover={{ scale: 1.02, boxShadow: `0 8px 30px ${matchColor}40` }}

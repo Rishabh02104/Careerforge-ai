@@ -10,6 +10,7 @@ import PricingSection from "@/components/landing/PricingSection";
 import AboutSection from "@/components/landing/AboutSection";
 import MagneticButton from "@/components/ui/MagneticButton";
 import { useCursor } from "@/context/CursorContext";
+import { useAuth } from "@/context/AuthContext";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -541,6 +542,7 @@ function AICore() {
 }
 
 export default function Home() {
+  const { user } = useAuth();
   const { setCursor, resetCursor } = useCursor();
   const router = useRouter();
 
@@ -654,9 +656,9 @@ export default function Home() {
             className="mt-6 flex items-center gap-8"
           >
             {[
-              { value: "50K+", label: "Users" },
-              { value: "94%",  label: "Interview rate" },
-              { value: "4.9★", label: "Rating" },
+              { value: "Beta", label: "Current Stage" },
+              { value: "Active",  label: "Development" },
+              { value: "LLaMA & Groq", label: "AI Models" },
             ].map((s) => (
               <div key={s.label} className="flex flex-col">
                 <span className="text-lg font-bold text-white">{s.value}</span>
@@ -674,7 +676,7 @@ export default function Home() {
               transitionType="ripple"
               cursorMode="button-ripple"
               className="rounded-xl bg-cyan-500 px-7 py-3 font-semibold text-black text-sm shadow-lg shadow-cyan-500/25"
-              onClick={() => router.push("/signup")}
+              onClick={() => router.push(user ? (user.role === "admin" ? "/admin" : "/dashboard") : "/signup")}
             >
               Get Started Free →
             </MagneticButton>
@@ -685,7 +687,7 @@ export default function Home() {
               className="rounded-xl border border-white/15 bg-white/5 px-7 py-3 text-sm text-white backdrop-blur"
               onClick={() => router.push("/demo")}
             >
-              Live Demo
+              Interactive Sandbox
             </MagneticButton>
           </motion.div>
 

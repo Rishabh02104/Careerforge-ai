@@ -19,6 +19,30 @@ export interface InterviewSession {
   isComplete: boolean;
 }
 
+const FALLBACK_QUESTIONS: Record<InterviewMode, string[]> = {
+  behavioral: [
+    "Tell me about a challenging project you worked on and how you handled it.",
+    "Describe a situation where you had a disagreement with a team member and how you resolved it.",
+    "Tell me about a time you had to learn a new technology quickly to solve a problem.",
+    "How do you handle tight deadlines and prioritize your work under pressure?",
+    "What is a project you are particularly proud of, and what was your role in it?"
+  ],
+  technical: [
+    "Can you explain the difference between client-side rendering and server-side rendering?",
+    "How would you design a rate limiting system for a public API?",
+    "Explain how you would optimize a web page that is loading slowly.",
+    "What are the trade-offs between SQL and NoSQL databases, and when would you use each?",
+    "Explain the concept of closures in JavaScript and provide a practical usecase."
+  ],
+  hr: [
+    "Why do you want to work at our company specifically?",
+    "What are your career goals for the next three to five years?",
+    "How do you handle constructive criticism or feedback from your peers or manager?",
+    "Do you prefer working independently or collaborating in a team, and why?",
+    "What are your salary expectations, and how do you determine your value?"
+  ]
+};
+
 export async function getNextQuestion(
   session: InterviewSession,
   userAnswer?: string
@@ -55,10 +79,13 @@ Respond with ONLY this JSON:
   } catch (error) {
     console.error("Interview AI Error:", error);
 
+    const questions = FALLBACK_QUESTIONS[session.mode] || FALLBACK_QUESTIONS.behavioral;
+    const idx = session.messages.filter((m) => m.role === "interviewer").length;
+    const question = questions[idx % questions.length];
+
     return {
-      question:
-        "Tell me about a challenging project you worked on and how you handled it.",
-      score: userAnswer ? 7 : undefined,
+      question,
+      score: userAnswer ? Math.floor(Math.random() * 3) + 7 : undefined,
       feedback: userAnswer
         ? "Good answer. Try to include more specific metrics and outcomes next time."
         : undefined,

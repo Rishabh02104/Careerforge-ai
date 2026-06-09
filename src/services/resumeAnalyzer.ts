@@ -17,37 +17,39 @@ export interface ResumeAnalysis {
 
 // ── Extract text from any file type ──────────────────────────────────────────
 export async function extractTextFromFile(file: File): Promise<string> {
-  const ext = file.name.split(".").pop()?.toLowerCase();
-
-  // ── TXT — read directly ───────────────────────────────────────────────────
-  if (ext === "txt" || file.type === "text/plain") {
-    return await file.text();
-  }
-
-  // ── PDF — use pdfjs-dist ──────────────────────────────────────────────────
-  if (ext === "pdf" || file.type === "application/pdf") {
-    return await extractFromPDF(file);
-  }
-
-  // ── DOCX — use mammoth ────────────────────────────────────────────────────
-  if (
-    ext === "docx" ||
-    file.type ===
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-  ) {
-    return await extractFromDOCX(file);
-  }
-
-  // ── DOC — fallback ────────────────────────────────────────────────────────
-  if (ext === "doc" || file.type === "application/msword") {
-    return await extractFromDOCX(file);
-  }
-
-  // ── Unknown — try reading as text ─────────────────────────────────────────
   try {
-    return await file.text();
+    const ext = file.name.split(".").pop()?.toLowerCase();
+
+    // ── TXT — read directly ───────────────────────────────────────────────────
+    if (ext === "txt" || file.type === "text/plain") {
+      const txt = await file.text();
+      return txt.trim().length < 50 ? "SCANNED_PDF_OR_EMPTY" : txt;
+    }
+
+    // ── PDF — use pdfjs-dist ──────────────────────────────────────────────────
+    if (ext === "pdf" || file.type === "application/pdf") {
+      return await extractFromPDF(file);
+    }
+
+    // ── DOCX — use mammoth ────────────────────────────────────────────────────
+    if (
+      ext === "docx" ||
+      file.type ===
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ) {
+      return await extractFromDOCX(file);
+    }
+
+    // ── DOC — fallback ────────────────────────────────────────────────────────
+    if (ext === "doc" || file.type === "application/msword") {
+      return await extractFromDOCX(file);
+    }
+
+    // ── Unknown — try reading as text ─────────────────────────────────────────
+    const rawText = await file.text();
+    return rawText.trim().length < 50 ? "SCANNED_PDF_OR_EMPTY" : rawText;
   } catch {
-    return `Resume file: ${file.name}`;
+    return "SCANNED_PDF_OR_EMPTY";
   }
 }
 
@@ -83,13 +85,13 @@ async function extractFromPDF(file: File): Promise<string> {
       .trim();
 
     if (cleaned.length < 50) {
-      return `Resume: ${file.name}. Could not extract sufficient text. Please try a different format.`;
+      return "SCANNED_PDF_OR_EMPTY";
     }
 
     return cleaned;
   } catch (err) {
     console.error("PDF extraction error:", err);
-    return `Resume file: ${file.name}. PDF parsing failed — please try uploading as a .txt or .docx file.`;
+    return "SCANNED_PDF_OR_EMPTY";
   }
 }
 
@@ -101,13 +103,13 @@ async function extractFromDOCX(file: File): Promise<string> {
     const text = result.value.trim();
 
     if (text.length < 50) {
-      return `Resume: ${file.name}. Could not extract sufficient text.`;
+      return "SCANNED_PDF_OR_EMPTY";
     }
 
     return text;
   } catch (err) {
     console.error("DOCX extraction error:", err);
-    return `Resume file: ${file.name}. DOCX parsing failed — please try uploading as a .txt file.`;
+    return "SCANNED_PDF_OR_EMPTY";
   }
 }
 

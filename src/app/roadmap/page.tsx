@@ -40,7 +40,7 @@ const PATHS: RoadmapPath[] = [
         id: "f1",
         title: "HTML & CSS Fundamentals",
         desc: "Build the foundation of every website — structure and styling",
-        status: "completed",
+        status: "locked",
         skills: ["HTML5", "CSS3", "Flexbox", "Grid", "Responsive Design"],
         resources: ["MDN Web Docs", "CSS Tricks", "freeCodeCamp"],
         estimatedWeeks: 3,
@@ -50,7 +50,7 @@ const PATHS: RoadmapPath[] = [
         id: "f2",
         title: "JavaScript Essentials",
         desc: "Learn the language of the web — variables, functions, DOM, async",
-        status: "completed",
+        status: "locked",
         skills: ["ES6+", "DOM Manipulation", "Fetch API", "Promises", "Async/Await"],
         resources: ["JavaScript.info", "Eloquent JavaScript", "You Don't Know JS"],
         estimatedWeeks: 5,
@@ -60,7 +60,7 @@ const PATHS: RoadmapPath[] = [
         id: "f3",
         title: "React & TypeScript",
         desc: "Build scalable component-based UIs with the most popular framework",
-        status: "current",
+        status: "locked",
         skills: ["React 18", "TypeScript", "Hooks", "Context API", "React Router"],
         resources: ["React Docs", "Total TypeScript", "Kent C. Dodds Blog"],
         estimatedWeeks: 6,
@@ -109,7 +109,7 @@ const PATHS: RoadmapPath[] = [
         id: "b1",
         title: "Node.js & Express",
         desc: "Build fast, scalable server-side applications with JavaScript",
-        status: "completed",
+        status: "locked",
         skills: ["Node.js", "Express.js", "REST APIs", "Middleware", "Error Handling"],
         resources: ["Node.js Docs", "Express Guide", "The Odin Project"],
         estimatedWeeks: 4,
@@ -119,7 +119,7 @@ const PATHS: RoadmapPath[] = [
         id: "b2",
         title: "Databases",
         desc: "Store and query data efficiently with SQL and NoSQL databases",
-        status: "current",
+        status: "locked",
         skills: ["PostgreSQL", "MongoDB", "Prisma", "Redis", "Query Optimization"],
         resources: ["PostgreSQL Docs", "MongoDB University", "Prisma Docs"],
         estimatedWeeks: 5,
@@ -168,7 +168,7 @@ const PATHS: RoadmapPath[] = [
         id: "fs1",
         title: "Web Fundamentals",
         desc: "HTML, CSS, JavaScript — the holy trinity of the web",
-        status: "completed",
+        status: "locked",
         skills: ["HTML5", "CSS3", "JavaScript ES6+", "Git", "Chrome DevTools"],
         resources: ["The Odin Project", "freeCodeCamp", "MDN"],
         estimatedWeeks: 6,
@@ -178,7 +178,7 @@ const PATHS: RoadmapPath[] = [
         id: "fs2",
         title: "React + Node Stack",
         desc: "Build complete web apps with the most popular JS stack",
-        status: "completed",
+        status: "locked",
         skills: ["React", "Node.js", "Express", "REST APIs", "JSON"],
         resources: ["Full Stack Open", "MERN Stack Tutorial", "Traversy Media"],
         estimatedWeeks: 8,
@@ -188,7 +188,7 @@ const PATHS: RoadmapPath[] = [
         id: "fs3",
         title: "Database Integration",
         desc: "Connect your apps to persistent data storage",
-        status: "current",
+        status: "locked",
         skills: ["MongoDB", "PostgreSQL", "Prisma ORM", "Data Modeling"],
         resources: ["Prisma Docs", "MongoDB Atlas", "Supabase"],
         estimatedWeeks: 4,
@@ -227,7 +227,7 @@ const PATHS: RoadmapPath[] = [
         id: "d1",
         title: "Python for Data",
         desc: "Master Python and its data ecosystem",
-        status: "completed",
+        status: "locked",
         skills: ["Python", "NumPy", "Pandas", "Matplotlib", "Jupyter"],
         resources: ["Python Docs", "Kaggle Learn", "Corey Schafer YouTube"],
         estimatedWeeks: 4,
@@ -237,7 +237,7 @@ const PATHS: RoadmapPath[] = [
         id: "d2",
         title: "Statistics & Math",
         desc: "Build the mathematical foundation for machine learning",
-        status: "current",
+        status: "locked",
         skills: ["Probability", "Linear Algebra", "Statistics", "Calculus Basics"],
         resources: ["Khan Academy", "StatQuest", "3Blue1Brown"],
         estimatedWeeks: 5,
@@ -276,7 +276,7 @@ const PATHS: RoadmapPath[] = [
         id: "do1",
         title: "Linux & Bash",
         desc: "Master the command line and Linux system administration",
-        status: "completed",
+        status: "locked",
         skills: ["Linux", "Bash Scripting", "File System", "Permissions", "Cron Jobs"],
         resources: ["Linux Journey", "The Linux Command Line Book", "OverTheWire"],
         estimatedWeeks: 3,
@@ -286,7 +286,7 @@ const PATHS: RoadmapPath[] = [
         id: "do2",
         title: "Docker & Containers",
         desc: "Package and run applications in isolated containers",
-        status: "current",
+        status: "locked",
         skills: ["Docker", "Docker Compose", "Images", "Volumes", "Networking"],
         resources: ["Docker Docs", "Play with Docker", "TechWorld with Nana"],
         estimatedWeeks: 4,
@@ -350,10 +350,11 @@ function NodeCard({
         isSelected
           ? "border-opacity-100 shadow-lg"
           : statusConfig.border
-      } ${node.status === "locked" ? "opacity-60" : ""}`}
+      } ${node.status === "locked" ? "opacity-40 cursor-not-allowed" : ""}`}
       style={isSelected ? { borderColor: color + "80", boxShadow: `0 0 20px ${color}20` } : {}}
       whileHover={node.status !== "locked" ? { x: 4 } : {}}
       whileTap={node.status !== "locked" ? { scale: 0.98 } : {}}
+      disabled={node.status === "locked"}
     >
       <div className="flex items-start gap-3">
         {/* Status icon */}
@@ -365,7 +366,7 @@ function NodeCard({
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2 mb-1">
-            <h4 className={`font-semibold text-sm ${node.status === "locked" ? "text-slate-400" : "text-white"}`}>
+            <h4 className={`font-semibold text-sm ${node.status === "locked" ? "text-slate-500" : "text-white"}`}>
               {node.title}
             </h4>
             <span className="text-[10px] text-slate-500 flex-shrink-0">
@@ -394,9 +395,11 @@ function NodeCard({
 function NodeDetail({
   node,
   color,
+  onMarkComplete,
 }: {
   node: RoadmapNode;
   color: string;
+  onMarkComplete: () => void;
 }) {
   return (
     <motion.div
@@ -487,12 +490,13 @@ function NodeDetail({
       {/* Action */}
       {node.status === "current" && (
         <motion.button
+          onClick={onMarkComplete}
           className="w-full rounded-xl py-3 text-sm font-semibold text-black"
           style={{ background: color }}
           whileHover={{ scale: 1.02, boxShadow: `0 8px 30px ${color}40` }}
           whileTap={{ scale: 0.97 }}
         >
-          Continue Learning →
+          Mark as Complete ✓
         </motion.button>
       )}
       {node.status === "locked" && (
@@ -519,33 +523,91 @@ function NodeDetail({
 export default function RoadmapPage() {
   const { user } = useAuth();
   const [selectedPath, setSelectedPath] = useState<RoadmapCategory>("fullstack");
-  const [selectedNode, setSelectedNode] = useState<string>("fs3");
+  const [completedNodes, setCompletedNodes] = useState<Record<string, string[]>>({});
+  const [selectedNode, setSelectedNode] = useState<string>("fs1");
+
+  // Read progress from localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("cf_roadmap_progress");
+      if (saved) {
+        try {
+          setCompletedNodes(JSON.parse(saved));
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+  }, []);
 
   const currentPath = PATHS.find((p) => p.id === selectedPath)!;
-  const currentNode = currentPath.nodes.find((n) => n.id === selectedNode)
-    ?? currentPath.nodes[0];
+
+  // Compute dynamic nodes status
+  const getDynamicNodes = (path: RoadmapPath): RoadmapNode[] => {
+    const completedList = completedNodes[path.id] || [];
+    let foundCurrent = false;
+
+    return path.nodes.map((node) => {
+      let status: NodeStatus = "locked";
+      if (completedList.includes(node.id)) {
+        status = "completed";
+      } else if (!foundCurrent) {
+        status = "current";
+        foundCurrent = true;
+      }
+      return { ...node, status };
+    });
+  };
+
+  const dynamicNodes = getDynamicNodes(currentPath);
+  const currentNode = dynamicNodes.find((n) => n.id === selectedNode) ?? dynamicNodes[0];
+
+  // Reset selected node when path changes to the first active/current node
+  useEffect(() => {
+    const firstCurrent = dynamicNodes.find((n) => n.status === "current") ?? dynamicNodes.find((n) => n.status === "completed") ?? dynamicNodes[0];
+    setSelectedNode(firstCurrent.id);
+  }, [selectedPath, completedNodes]);
 
   // Progress calculation
-  const completed = currentPath.nodes.filter((n) => n.status === "completed").length;
-  const total = currentPath.nodes.length;
-  const progress = Math.round((completed / total) * 100);
-  const totalXP = currentPath.nodes
+  const completedCount = dynamicNodes.filter((n) => n.status === "completed").length;
+  const totalCount = dynamicNodes.length;
+  const progress = Math.round((completedCount / totalCount) * 100);
+  const totalXP = dynamicNodes
     .filter((n) => n.status === "completed")
     .reduce((sum, n) => sum + n.xp, 0);
 
-  // Reset selected node when path changes
-  useEffect(() => {
-    const firstCurrent = currentPath.nodes.find((n) => n.status === "current");
-    const firstNode = firstCurrent ?? currentPath.nodes[0];
-    setSelectedNode(firstNode.id);
-  }, [selectedPath]);
+  // Handlers
+  const handleMarkComplete = () => {
+    const pathCompleted = completedNodes[currentPath.id] || [];
+    if (!pathCompleted.includes(currentNode.id)) {
+      const updated = {
+        ...completedNodes,
+        [currentPath.id]: [...pathCompleted, currentNode.id],
+      };
+      setCompletedNodes(updated);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("cf_roadmap_progress", JSON.stringify(updated));
+      }
+    }
+  };
+
+  const handleResetProgress = () => {
+    const updated = {
+      ...completedNodes,
+      [currentPath.id]: [],
+    };
+    setCompletedNodes(updated);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("cf_roadmap_progress", JSON.stringify(updated));
+    }
+  };
 
   return (
     <main className="min-h-screen bg-[#050816] text-white">
       <div className="flex flex-col h-screen overflow-hidden">
 
         {/* ── Top bar ──────────────────────────────────────────────────────── */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 flex-shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 flex-shrink-0 gap-4">
           <div className="flex items-center gap-4">
             <Link href="/" className="text-cyan-400 text-sm hover:underline">
               ← Home
@@ -553,13 +615,13 @@ export default function RoadmapPage() {
             <div className="flex items-center gap-2">
               <span className="text-white font-bold">Career Roadmap</span>
               <span className="text-[10px] border border-cyan-500/20 bg-cyan-500/10 text-cyan-400 rounded-full px-2 py-0.5">
-                Beta
+                Interactive
               </span>
             </div>
           </div>
 
           {/* XP + progress */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
               <span className="text-[10px] text-slate-400 uppercase tracking-widest">
                 XP Earned
@@ -572,7 +634,7 @@ export default function RoadmapPage() {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-32 h-1.5 bg-white/8 rounded-full overflow-hidden">
+              <div className="w-24 h-1.5 bg-white/8 rounded-full overflow-hidden">
                 <motion.div
                   className="h-full rounded-full"
                   style={{ background: currentPath.color }}
@@ -582,6 +644,16 @@ export default function RoadmapPage() {
               </div>
               <span className="text-xs text-slate-400">{progress}%</span>
             </div>
+
+            <motion.button
+              onClick={handleResetProgress}
+              disabled={completedCount === 0}
+              className="rounded-xl border border-red-500/25 bg-red-500/5 hover:bg-red-500/15 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-red-400 disabled:opacity-30 disabled:pointer-events-none transition"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              Reset Path
+            </motion.button>
           </div>
         </div>
 
@@ -594,7 +666,8 @@ export default function RoadmapPage() {
                 Career Paths
               </p>
               {PATHS.map((path) => {
-                const done = path.nodes.filter((n) => n.status === "completed").length;
+                const dynamicPathNodes = getDynamicNodes(path);
+                const done = dynamicPathNodes.filter((n) => n.status === "completed").length;
                 return (
                   <motion.button
                     key={path.id}
@@ -652,10 +725,10 @@ export default function RoadmapPage() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
-              {currentPath.nodes.map((node, i) => (
+              {dynamicNodes.map((node, i) => (
                 <div key={node.id} className="relative">
                   {/* Connector line */}
-                  {i < currentPath.nodes.length - 1 && (
+                  {i < dynamicNodes.length - 1 && (
                     <div
                       className="absolute left-7 top-full w-px h-2 z-10"
                       style={{
@@ -686,6 +759,7 @@ export default function RoadmapPage() {
                 key={currentNode.id}
                 node={currentNode}
                 color={currentPath.color}
+                onMarkComplete={handleMarkComplete}
               />
             </AnimatePresence>
           </div>
