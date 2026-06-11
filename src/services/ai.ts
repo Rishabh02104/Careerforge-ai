@@ -1,12 +1,20 @@
 import Groq from "groq-sdk";
 
-const groq = new Groq({
-  apiKey: process.env.NEXT_PUBLIC_GROQ_API_KEY,
-  dangerouslyAllowBrowser: true,
-});
+let groqInstance: Groq | null = null;
+
+function getGroqClient(): Groq {
+  if (!groqInstance) {
+    groqInstance = new Groq({
+      apiKey: process.env.NEXT_PUBLIC_GROQ_API_KEY || "dummy-key-for-build-prerender",
+      dangerouslyAllowBrowser: true,
+    });
+  }
+  return groqInstance;
+}
 
 export async function generateAIResponse(prompt: string, timeoutMs: number = 12000): Promise<string> {
   const apiCall = (async () => {
+    const groq = getGroqClient();
     const completion = await groq.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
       model: "llama-3.3-70b-versatile",
