@@ -4,7 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { analyzeResume, extractTextFromFile, ResumeAnalysis } from "@/services/resumeAnalyzer";
+import { ResumeAnalysis } from "@/services/resumeAnalyzer";
 import { useAuth } from "@/context/AuthContext";
 
 type UploadState = "idle" | "uploading" | "analyzing" | "done" | "error";
@@ -277,29 +277,26 @@ export default function ResumePage() {
     }
 
     try {
-      const text = await extractTextFromFile(file);
+      const formData = new FormData();
+      formData.append("file", file);
 
-      // Show user what was extracted (debug helper)
-      console.log("Extracted text preview:", text.slice(0, 200));
+      const response = await fetch("/api/analyze-resume", {
+        method: "POST",
+        body: formData,
+      });
 
-      if (text === "SCANNED_PDF_OR_EMPTY") {
-        setErrorMsg("This looks like a scanned PDF or empty document. Please paste your resume text below to continue:");
-        setShowPasteFallback(true);
-        setUploadState("error");
-        return;
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        if (errorData.code === "SCANNED_PDF_OR_EMPTY" || response.status === 422) {
+          setErrorMsg("This looks like a scanned PDF or empty document. Please paste your resume text below to continue:");
+          setShowPasteFallback(true);
+          setUploadState("error");
+          return;
+        }
+        throw new Error(errorData.error || "Analysis failed.");
       }
 
-      const result = await analyzeResume(text);
-
-      // If all scores are 0 something went wrong
-      if (result.overallScore === 0) {
-        setErrorMsg(
-          "Could not analyze text from this file. Please paste your resume text below to complete the check:"
-        );
-        setShowPasteFallback(true);
-        setUploadState("error");
-        return;
-      }
+      const result = await response.json();
 
       // Save to localStorage
       if (typeof window !== "undefined") {
@@ -308,9 +305,9 @@ export default function ResumePage() {
 
       setAnalysis(result);
       setUploadState("done");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setErrorMsg("Analysis failed. Please paste your resume text below to try again:");
+      setErrorMsg(err.message || "Analysis failed. Please paste your resume text below to try again:");
       setShowPasteFallback(true);
       setUploadState("error");
     }
@@ -331,12 +328,20 @@ export default function ResumePage() {
     }
 
     try {
-      const result = await analyzeResume(pastedText);
-      if (result.overallScore === 0) {
-        setErrorMsg("Failed to analyze the pasted text. Please make sure it resembles a resume.");
-        setUploadState("error");
-        return;
+      const response = await fetch("/api/analyze-resume", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: pastedText }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Analysis failed.");
       }
+
+      const result = await response.json();
 
       // Save to localStorage
       if (typeof window !== "undefined") {
@@ -346,9 +351,9 @@ export default function ResumePage() {
       setAnalysis(result);
       setUploadState("done");
       setShowPasteFallback(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setErrorMsg("Analysis failed. Please try again.");
+      setErrorMsg(err.message || "Analysis failed. Please try again.");
       setUploadState("error");
     }
   };
