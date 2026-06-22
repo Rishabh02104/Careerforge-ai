@@ -106,21 +106,62 @@ Respond with exactly this JSON structure:
 }`;
 
     const text = await generateAIResponse(prompt);
-    const cleaned = text
-      .replace(/```json/g, "")
-      .replace(/```/g, "")
-      .trim();
-
+    
     try {
-      const parsed = JSON.parse(cleaned);
-      if (
-        typeof parsed.overallScore === "number" &&
-        Array.isArray(parsed.strengths)
-      ) {
-        return parsed as ResumeAnalysis;
+      // Find the JSON block using a regex to ignore any surrounding conversational text or markdown codeblocks
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error("No JSON object found in response");
       }
-      return getFallbackAnalysis();
-    } catch {
+      
+      const parsed = JSON.parse(jsonMatch[0].trim());
+      
+      // Map properties with robust fallbacks and type-safety
+      const overallScore = Number(parsed.overallScore) || 75;
+      const atsScore = Number(parsed.atsScore) || overallScore;
+      const keywordsScore = Number(parsed.keywordsScore) || overallScore;
+      const formattingScore = Number(parsed.formattingScore) || overallScore;
+      const experienceScore = Number(parsed.experienceScore) || overallScore;
+      
+      const strengths = Array.isArray(parsed.strengths) && parsed.strengths.length > 0
+        ? parsed.strengths.map(String)
+        : ["Good structural layout", "Clean readability and structure"];
+        
+      const improvements = Array.isArray(parsed.improvements) && parsed.improvements.length > 0
+        ? parsed.improvements.map(String)
+        : ["Add more quantifiable achievements", "Tailor keywords to match targeted roles"];
+        
+      const missingKeywords = Array.isArray(parsed.missingKeywords)
+        ? parsed.missingKeywords.map(String)
+        : [];
+        
+      const suggestedKeywords = Array.isArray(parsed.suggestedKeywords)
+        ? parsed.suggestedKeywords.map(String)
+        : [];
+        
+      const summary = typeof parsed.summary === "string" && parsed.summary
+        ? parsed.summary
+        : "Resume analyzed successfully with standard structural checks.";
+        
+      const jobTitleMatch = typeof parsed.jobTitleMatch === "string" && parsed.jobTitleMatch
+        ? parsed.jobTitleMatch
+        : "Professional";
+
+      return {
+        overallScore,
+        atsScore,
+        keywordsScore,
+        formattingScore,
+        experienceScore,
+        strengths,
+        improvements,
+        missingKeywords,
+        suggestedKeywords,
+        summary,
+        jobTitleMatch
+      };
+    } catch (parseError) {
+      console.error("JSON parsing/mapping failed:", parseError, "Raw output:", text);
       return getFallbackAnalysis();
     }
   } catch (err) {
