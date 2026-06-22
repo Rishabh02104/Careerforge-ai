@@ -6,11 +6,10 @@ import { generateAIResponse } from "@/services/ai";
 import { ResumeAnalysis } from "@/services/resumeAnalyzer";
 
 // ── Setup PDF Worker for Server Context ──────────────────────────────────────
-const isWindows = process.platform === "win32";
-const absoluteWorkerPath = path.join(process.cwd(), "node_modules", "pdfjs-dist", "legacy", "build", "pdf.worker.mjs");
-pdfjsLib.GlobalWorkerOptions.workerSrc = isWindows
-  ? `file:///${absoluteWorkerPath.replace(/\\/g, "/")}`
-  : `file://${absoluteWorkerPath}`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/legacy/build/pdf.worker.mjs",
+  import.meta.url
+).toString();
 
 // ── Extract Text from Buffer based on Extension ──────────────────────────────
 async function extractTextFromBuffer(buffer: Buffer, fileName: string): Promise<string> {
